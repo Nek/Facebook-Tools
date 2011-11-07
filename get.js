@@ -7,40 +7,6 @@ var access_token;
 var group_id = 180638415285895;
 var flow = require('flow');
 
-
-function unescapeFromUtf16(str) {
-  var utf16_codes = convertEscapedUtf16CodesToUtf16Codes(str);
-  return convertUtf16CodesToString(utf16_codes);
-}
-
-function convertUtf16CodesToString(utf16_codes) {
-  var unescaped = '';
-  for (var i = 0; i < utf16_codes.length; ++i) {
-    unescaped += String.fromCharCode(utf16_codes[i]);
-  }
-  return unescaped;
-}
-
-function convertEscapedUtf16CodesToUtf16Codes(str) {
-  return convertEscapedCodesToCodes(str, "\\u", 16, 16);
-}
-
-function convertEscapedCodesToCodes(str, prefix, base, num_bits) {
-  var parts = str.split(prefix);
-  parts.shift();  // Trim the first element.
-  var codes = [];
-  var max = Math.pow(2, num_bits);
-  for (var i = 0; i < parts.length; ++i) {
-    var code = parseInt(parts[i], base);
-    if (code >= 0 && code < max) {
-      codes.push(code);
-    } else {
-      // Malformed code ignored.
-    }
-  }
-  return codes;
-}
-
 https.get(
 {
   	host: 'graph.facebook.com',
