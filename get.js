@@ -5,6 +5,7 @@ var app_id = '103011506473978';
 var app_secret = '8b4a1b33c70ca91d8ad2b3dea81703e0';
 var access_token;
 var group_id = 180638415285895;
+var flow = require('flow');
 
 
 function unescapeFromUtf16(str) {
