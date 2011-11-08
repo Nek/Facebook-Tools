@@ -15,7 +15,8 @@ function getGroupFeed(group_id) {
             host: 'graph.facebook.com',
             path: '/oauth/access_token?type=client_cred&client_id='+app_id+'&client_secret='+app_secret
         };
-        https.get( access_key_request_options, function(res){n(err, res)}).on('error', function(err){n(err)});
+        https.get( access_key_request_options, function(res){n(err, res)})
+            .on('error', function(err){n(err)});
     })
     .then(function(n,err,res){
          if (err) throw err;
@@ -25,12 +26,14 @@ function getGroupFeed(group_id) {
             access_token += nd;
          });
          res.on('end', function(){n(undefined, access_token)});
+         res.on('error', function(err){ n(err)});
     })
     .then(function(n, err, access_token){
         if (err) throw err;
         console.log(access_token);
         var stream = fs.createWriteStream("feed.json");
 	    stream.once('open', function(){n(undefined, access_token, stream)});
+        stream.once('error', function(err){n(err)});
     })
     .then(function(n, err, access_token, stream) {
         if (err) throw err;
@@ -38,7 +41,8 @@ function getGroupFeed(group_id) {
             host: 'graph.facebook.com',
             path: '/'+group_id+'/feed?'+access_token
 	    };
-        https.get( get_group_object_request_options, function(res){n(undefined, res, stream)}).on('error', function(err){n(err)});
+        https.get( get_group_object_request_options, function(res){n(undefined, res, stream)})
+            .on('error', function(err){n(err)});
     })
     .then(function(n, err, res, stream){
         if (err) throw err;
@@ -48,6 +52,7 @@ function getGroupFeed(group_id) {
             all += d;
         });
 	    res.on('end', function(){n(undefined, all, stream)});
+        res.on('error', function(err) {n(err)});
     })
     .then(function(n, err, all, stream){
         if (err) throw err;
@@ -58,9 +63,14 @@ function getGroupFeed(group_id) {
             console.log(data[i]._id);
         }
         data =  JSON.stringify({docs:data});
+        stream.removeAllListeners('error');
+        stream.once('error', function(err){n(err)});
+        stream.once('close', function(){n(undefined, data)});
         stream.write(data);
         stream.end();
-
+    })
+    .then(function(n, err, data){
+        if (err) throw err;
         var post_docs_request_options = {
           host: 'localhost',
           port: 5984,
@@ -72,7 +82,7 @@ function getGroupFeed(group_id) {
         req.on('error', function(err){n(err)});
         req.write(data);
         req.end();
-    })
+        })
     .then(function(n, err, res){
           if (err) throw err;
           console.log('Status: ' + res.statusCode);
