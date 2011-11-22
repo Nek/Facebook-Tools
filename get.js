@@ -9,6 +9,7 @@ function getGroupFeed(group_id) {
     var err;
     sequence
     .then(function(n) {
+    	// Don't forget to use your own app_id and app_secret. This app_id is real but app_secret is fake one.
         var app_id = '103011506473978';
         var app_secret = '8b4a1b33c70ca91d8ad2b3dea81703e0';
         var access_key_request_options = {
